@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chương Trình Ôn Thi Cisco 27 Câu Hỏi</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .flashcard {
+            perspective: 1000px;
+        }
+        .flashcard-inner {
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        .flashcard.flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+        .flashcard-front, .flashcard-back {
+            backface-visibility: hidden;
+        }
+        .flashcard-back {
+            transform: rotateY(180deg);
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-slate-800 border-b border-slate-700 sticky top-0 z-50 shadow-md">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="p-2.5 bg-indigo-600 rounded-lg text-white shadow-lg shadow-indigo-500/20">
+                    <i class="fa-solid fa-graduation-cap text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                        Cisco Exam Prep <span class="text-xs bg-indigo-500/30 text-indigo-300 px-2.5 py-0.5 rounded-full font-semibold">Bộ Đề 27 Câu</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Ứng dụng luyện tập và thi thử lý thuyết mạng nâng cao</p>
+                </div>
+            </div>
+            
+            <!-- Thống kê chung -->
+            <div id="global-stats" class="flex gap-4 text-xs bg-slate-800/80 rounded-lg">
+                <div class="text-center px-3 py-1.5 border-r border-slate-700">
+                    <span class="block text-slate-400">Tổng số câu</span>
+                    <span class="font-bold text-base text-indigo-400">27</span>
+                </div>
+                <div class="text-center px-3 py-1.5 border-r border-slate-700">
+                    <span class="block text-slate-400">Đã thuộc</span>
+                    <span id="stat-mastered" class="font-bold text-base text-emerald-400">0</span>
+                </div>
+                <div class="text-center px-3 py-1.5">
+                    <span class="block text-slate-400">Tiến độ</span>
+                    <span id="stat-percent" class="font-bold text-base text-amber-400">0%</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="bg-slate-800/50 border-b border-slate-800 py-2 sticky top-[73px] z-40 backdrop-blur-md">
+        <div class="max-w-4xl mx-auto px-4 flex justify-around">
+            <button onclick="switchTab('all-list')" id="btn-all-list" class="nav-tab active flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all text-indigo-400 bg-indigo-500/10">
+                <i class="fa-solid fa-list-check"></i>
+                <span>Xem Toàn Bộ (27 Câu)</span>
+            </button>
+            <button onclick="switchTab('flashcard-mode')" id="btn-flashcard-mode" class="nav-tab flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all text-slate-400 hover:text-white hover:bg-slate-800">
+                <i class="fa-solid fa-clone"></i>
+                <span>Thẻ Ghi Nhớ</span>
+            </button>
+            <button onclick="switchTab('exam-mode')" id="btn-exam-mode" class="nav-tab flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all text-slate-400 hover:text-white hover:bg-slate-800">
+                <i class="fa-solid fa-pen-to-square"></i>
+                <span>Thi Thử (5 Câu)</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow max-w-6xl w-full mx-auto px-4 py-8">
+        
+        <!-- Tab 1: ALL LIST -->
+        <section id="tab-all-list" class="tab-content">
+            <div class="mb-6 flex flex-col md:flex-row gap-4 items-center justify-between">
+                <div>
+                    <h2 class="text-xl font-bold text-white">Danh Sách Câu Hỏi Ôn Tập</h2>
+                    <p class="text-sm text-slate-400">Tìm kiếm nhanh câu hỏi bằng từ khóa hoặc mã số</p>
+                </div>
+                <div class="relative w-full md:w-96">
+                    <input type="text" id="search-input" onkeyup="filterQuestions()" placeholder="Nhập từ khóa tìm kiếm (Ví dụ: OSPF, ACL, NAT...)" class="w-full bg-slate-800 border border-slate-700 rounded-lg pl-10 pr-4 py-2 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 placeholder-slate-500">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-500 text-sm"></i>
+                </div>
+            </div>
+
+            <!-- List container -->
+            <div id="questions-list-container" class="space-y-4">
+                <!-- Javascript will render questions here -->
+            </div>
+        </section>
+
+        <!-- Tab 2: FLASHCARD MODE -->
+        <section id="tab-flashcard-mode" class="tab-content hidden max-w-2xl mx-auto">
+            <div class="text-center mb-6">
+                <h2 class="text-xl font-bold text-white">Học Qua Thẻ Flashcard</h2>
+                <p class="text-sm text-slate-400">Ấn vào thẻ để lật xem đáp án và tự kiểm tra kiến thức</p>
+            </div>
+
+            <!-- Flashcard Deck Area -->
+            <div class="relative h-[420px] w-full mb-6 flashcard" id="main-flashcard">
+                <div class="flashcard-inner absolute w-full h-full cursor-pointer rounded-2xl shadow-2xl transition-transform duration-500 ease-in-out" onclick="flipCard()">
+                    
+                    <!-- Front (Question) -->
+                    <div class="flashcard-front absolute w-full h-full bg-gradient-to-br from-indigo-900 to-indigo-950 border border-indigo-700/50 rounded-2xl p-8 flex flex-col justify-between items-center text-center">
+                        <div class="w-full flex justify-between items-center text-xs text-indigo-400 font-semibold tracking-wider">
+                            <span id="fc-card-num">THẺ SỐ 1/27</span>
+                            <span class="bg-indigo-950 border border-indigo-700/60 px-2 py-1 rounded-md flex items-center gap-1">
+                                <i class="fa-regular fa-question-circle"></i> CÂU HỎI
+                            </span>
+                        </div>
+                        <div class="my-auto">
+                            <h3 id="fc-question" class="text-xl sm:text-2xl font-extrabold text-white leading-relaxed">
+                                Đang tải câu hỏi...
+                            </h3>
+                        </div>
+                        <div class="text-slate-400 text-xs flex items-center gap-2 animate-pulse">
+                            <i class="fa-solid fa-arrows-rotate"></i> Nhấp chuột vào thẻ để xem câu trả lời
+                        </div>
+                    </div>
+
+                    <!-- Back (Answer) -->
+                    <div class="flashcard-back absolute w-full h-full bg-slate-800 border border-slate-700 rounded-2xl p-6 flex flex-col justify-between overflow-y-auto">
+                        <div class="w-full flex justify-between items-center text-xs text-slate-400 font-semibold mb-4">
+                            <span class="text-indigo-400 font-bold" id="fc-card-num-back">CÂU TRẢ LỜI SỐ 1</span>
+                            <span class="bg-emerald-950 text-emerald-400 border border-emerald-800 px-2 py-1 rounded-md flex items-center gap-1">
+                                <i class="fa-regular fa-circle-check"></i> ĐÁP ÁN ĐÚNG
+                            </span>
+                        </div>
+                        <div class="flex-grow flex flex-col justify-center text-slate-200">
+                            <div id="fc-answer" class="text-sm leading-relaxed prose prose-invert overflow-x-auto">
+                                Đang tải đáp án...
+                            </div>
+                        </div>
+                        <div class="text-slate-500 text-xs text-center mt-4 pt-3 border-t border-slate-700/50">
+                            Nhấp chuột một lần nữa để quay lại câu hỏi
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Controller Controls -->
+            <div class="flex flex-col gap-4">
+                <!-- Navigation -->
+                <div class="flex items-center justify-between gap-4">
+                    <button onclick="prevCard()" class="flex-1 bg-slate-800 hover:bg-slate-700 active:scale-95 text-white py-3 px-4 rounded-xl font-medium transition-all border border-slate-700 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-arrow-left"></i> Câu Trước
+                    </button>
+                    <button onclick="markAsMastered()" id="btn-master" class="bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white p-3 rounded-xl font-medium transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20" title="Đánh dấu đã thuộc câu này">
+                        <i class="fa-solid fa-check text-lg"></i> <span class="hidden sm:inline">Đã thuộc câu này</span>
+                    </button>
+                    <button onclick="nextCard()" class="flex-1 bg-slate-800 hover:bg-slate-700 active:scale-95 text-white py-3 px-4 rounded-xl font-medium transition-all border border-slate-700 flex items-center justify-center gap-2">
+                        Câu Tiếp <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+
+                <!-- Utilities -->
+                <div class="flex justify-between items-center text-sm px-2 text-slate-400">
+                    <button onclick="shuffleDeck()" class="hover:text-indigo-400 transition-colors flex items-center gap-1.5">
+                        <i class="fa-solid fa-shuffle"></i> Trộn bộ câu hỏi
+                    </button>
+                    <button onclick="resetMasteredStatus()" class="hover:text-red-400 transition-colors flex items-center gap-1.5">
+                        <i class="fa-solid fa-rotate-left"></i> Học lại từ đầu (Reset)
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab 3: EXAM MODE -->
+        <section id="tab-exam-mode" class="tab-content hidden max-w-4xl mx-auto">
+            <!-- Start Screen -->
+            <div id="exam-start-screen" class="bg-slate-800 border border-slate-700 rounded-2xl p-8 text-center">
+                <div class="w-16 h-16 bg-amber-500/10 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+                    <i class="fa-solid fa-stopwatch"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-white mb-2">Chế Độ Thi Thử Lý Thuyết</h2>
+                <p class="text-slate-300 max-w-lg mx-auto mb-6 text-sm leading-relaxed">
+                    Hệ thống sẽ bốc ngẫu nhiên **đúng 5 câu hỏi** trong tổng số 27 câu ôn tập của bạn. Hãy tự viết câu trả lời vào khung soạn thảo để ôn luyện phản xạ thi cử.
+                </p>
+                <div class="bg-slate-900/60 p-4 rounded-lg inline-block text-left mb-8 border border-slate-700/50">
+                    <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2"><i class="fa-solid fa-triangle-exclamation text-amber-500 mr-1"></i> Quy chế tự luyện:</h4>
+                    <ul class="text-xs text-slate-300 space-y-1">
+                        <li>• Đọc câu hỏi và tự gõ câu trả lời của bạn.</li>
+                        <li>• Ấn "Nộp bài" sau khi trả lời xong cả 5 câu.</li>
+                        <li>• Đối chiếu bài làm với Đáp án gốc của giảng viên để tự chấm điểm.</li>
+                    </ul>
+                </div>
+                <div>
+                    <button onclick="startExam()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-8 py-3.5 rounded-xl shadow-lg shadow-indigo-600/30 active:scale-95 transition-all text-base">
+                        <i class="fa-solid fa-play mr-2"></i> Bắt đầu thi thử ngay
+                    </button>
+                </div>
+            </div>
+
+            <!-- Exam Running Screen -->
+            <div id="exam-running-screen" class="hidden space-y-6">
+                <div class="bg-slate-800/80 border border-slate-700/50 rounded-xl p-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div>
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                            <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                            Đề thi thử ngẫu nhiên
+                        </h3>
+                        <p class="text-xs text-slate-400">Được trích chọn tự động gồm 5 câu tự luận</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="confirmResetExam()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs px-3 py-2 rounded-lg transition-colors">
+                            <i class="fa-solid fa-arrows-rotate mr-1"></i> Đổi đề khác
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Questions Container -->
+                <div id="exam-questions-list" class="space-y-6">
+                    <!-- JS will generate 5 questions with textareas here -->
+                </div>
+
+                <!-- Action Button -->
+                <div class="pt-4 border-t border-slate-800 text-center flex justify-center gap-4" id="exam-actions">
+                    <button onclick="submitExam()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-8 py-3.5 rounded-xl shadow-lg shadow-emerald-600/20 transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-paper-plane"></i> Nộp bài & Xem Đáp Án
+                    </button>
+                </div>
+
+                <!-- Result Score Board (Hidden by default) -->
+                <div id="exam-results-board" class="hidden bg-slate-800 border-2 border-indigo-500 rounded-2xl p-6 md:p-8 mt-8">
+                    <div class="text-center max-w-md mx-auto mb-6">
+                        <h4 class="text-2xl font-bold text-white mb-2">🎉 Đã Nộp Bài Thành Công!</h4>
+                        <p class="text-sm text-slate-400">Hãy so sánh bài làm của bạn với đáp án mẫu bên dưới và tích chọn tự đánh giá bên dưới mỗi câu hỏi nhé.</p>
+                        
+                        <!-- Score counter interactive -->
+                        <div class="mt-4 inline-flex items-center gap-2 bg-indigo-950/50 border border-indigo-700/50 rounded-xl px-4 py-2">
+                            <span class="text-slate-300 text-sm">Điểm tự đánh giá:</span>
+                            <span class="text-xl font-black text-indigo-400" id="exam-score">0 / 5</span>
+                            <span class="text-slate-400 text-xs">câu đạt yêu cầu</span>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center mt-6">
+                        <button onclick="startExam()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-6 py-3 rounded-xl transition-all shadow-md">
+                            <i class="fa-solid fa-rotate-right mr-2"></i> Thử Sức Với Đề Khác
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-950 border-t border-slate-800 py-6 text-center text-slate-500 text-xs">
+        <p class="mb-1">Hệ Thống Trắc Nghiệm Ôn Tập & Thi Thử Lý Thuyết Mạng Cisco CCNA</p>
+        <p>Phát triển chuyên biệt để ghi nhớ nhanh - Chúc bạn đạt điểm tuyệt đối trong kỳ thi!</p>
+    </footer>
+
+    <!-- Custom Dialog / Modal for alerts -->
+    <div id="custom-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-sm w-full p-6 text-center shadow-2xl">
+            <div id="modal-icon" class="text-4xl text-amber-500 mb-3">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 id="modal-title" class="text-lg font-bold text-white mb-2">Thông báo</h3>
+            <p id="modal-desc" class="text-sm text-slate-300 mb-6">Mô tả thông báo ở đây.</p>
+            <div class="flex gap-3 justify-center">
+                <button id="modal-btn-cancel" onclick="closeModal()" class="hidden bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                    Hủy
+                </button>
+                <button id="modal-btn-confirm" onclick="closeModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2 rounded-lg text-sm font-semibold transition-colors">
+                    Đồng ý
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data source & Logic Scripts -->
+    <script>
+        // Core Database: 27 questions with details parsed from text and images.
+        const questionsDB = [
+            {
+                id: 1,
+                tag: "OSPF",
+                question: "Cách tính Cost mặc định của Cisco (OSPF Metric) là gì?",
+                answer: `
+                    <div class="space-y-2">
+                        <p class="font-bold text-indigo-400">→ Công thức tính:</p>
+                        <div class="bg-slate-900 p-3 rounded-lg border border-slate-700 font-mono text-center text-indigo-300 text-sm my-2">
+                            Cost = 100 Mbps / Bandwidth của interface (băng thông giao diện)
+                        </div>
+                        <p class="text-sm text-slate-300">Trong đó, giá trị băng thông mẫu chuẩn (Reference Bandwidth) mặc định là 100 Mbps ($10^8$ bps).</p>
+                    </div>
+                `
+            },
+            {
+                id: 2,
+                tag: "OSPF",
+                question: "Điều kiện trở thành láng giềng OSPF: Những thông số nào phải khớp nhau?",
+                answer: `
+                    <p class="font-bold text-indigo-400">Các thông số bắt buộc phải trùng khớp tuyệt đối giữa hai Router kế cận:</p>
+                    <ul class="list-disc list-inside space-y-2 mt-2 text-slate-300 text-sm">
+                        <li><strong class="text-white">Area ID:</strong> Phải cùng thuộc chung một phân vùng mạng vùng OSPF.</li>
+                        <li><strong class="text-white">Hello/Dead Interval:</strong> Các khoảng thời gian gửi bản tin chào hỏi và khai tử láng giềng phải giống nhau.</li>
+                        <li><strong class="text-white">Subnet Mask:</strong> Mặt nạ mạng con của các interface kết nối trực tiếp phải trùng nhau.</li>
+                        <li><strong class="text-white">Mật khẩu xác thực (Authentication password):</strong> Nếu có cấu hình bảo mật thì khóa bảo mật phải khớp hoàn toàn.</li>
+                    </ul>
+                `
+            },
+            {
+                id: 3,
+                tag: "ACL",
+                question: "Phân biệt sự khác nhau giữa Standard ACL và Extended ACL về tiêu chí lọc và vị trí đặt?",
+                answer: `
+                    <div class="space-y-4">
+                        <div class="border-l-4 border-emerald-500 pl-3">
+                            <h4 class="font-bold text-emerald-400">1. Standard ACL</h4>
+                            <p class="text-sm text-slate-300 mt-1">
+                                <strong class="text-white">Tiêu chí:</strong> Chỉ lọc lưu lượng dựa duy nhất trên <span class="text-indigo-400">địa chỉ IP nguồn</span> của gói tin.
+                            </p>
+                            <p class="text-sm text-slate-300">
+                                <strong class="text-white">Vị trí đặt:</strong> Nên đặt <span class="text-amber-400">GẦN ĐÍCH nhất có thể</span>. Lý do là để tránh việc chặn nhầm lưu lượng (traffic) hợp lệ đi sang các hướng mạng khác khi chặn ngay tại nguồn.
+                            </p>
+                        </div>
+                        <div class="border-l-4 border-indigo-500 pl-3">
+                            <h4 class="font-bold text-indigo-400">2. Extended ACL</h4>
+                            <p class="text-sm text-slate-300 mt-1">
+                                <strong class="text-white">Tiêu chí:</strong> Lọc dữ liệu rất chi tiết dựa vào <span class="text-indigo-400">IP nguồn, IP đích, giao thức (TCP, UDP, ICMP...)</span> và <span class="text-indigo-400">số hiệu cổng (Port Number)</span>.
+                            </p>
+                            <p class="text-sm text-slate-300">
+                                <strong class="text-white">Vị trí đặt:</strong> Nên đặt <span class="text-amber-400">GẦN NGUỒN nhất có thể</span>. Lý do là để loại bỏ lưu lượng không mong muốn ngay lập tức, tiết kiệm tối đa tài nguyên xử lý của mạng và băng thông đường truyền.
+                            </p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 4,
+                tag: "ACL",
+                question: "Quy tắc ACL \"Implicit Deny All\": Điều gì xảy ra nếu một gói tin không khớp dòng nào trong ACL?",
+                answer: `
+                    <p class="text-sm text-slate-300 leading-relaxed">
+                        Ở cuối mỗi danh sách kiểm soát truy cập (ACL) luôn luôn có một dòng lệnh ẩn ngầm định là <span class="text-red-400 font-bold font-mono">Deny All</span> (từ chối tất cả). 
+                    </p>
+                    <div class="bg-red-950/30 border border-red-900/50 rounded-lg p-3 my-3 text-sm text-red-300">
+                        <strong>Hệ quả:</strong> Nếu gói tin đi qua danh sách và không trùng khớp (match) với bất kỳ dòng <code class="bg-red-900/40 text-red-200 px-1 rounded">Permit</code> (cho phép) cụ thể nào, gói tin đó sẽ bị <strong class="text-white">hủy bỏ (discard) ngay lập tức</strong>.
+                    </div>
+                `
+            },
+            {
+                id: 5,
+                tag: "NAT",
+                question: "NAT Overload (PAT): Tại sao đây là giải pháp NAT phổ biến nhất hiện nay?",
+                answer: `
+                    <ul class="list-disc list-inside space-y-2 text-sm text-slate-300">
+                        <li>
+                            <strong class="text-white">Tiết kiệm IP công cộng tối đa:</strong> Cho phép <span class="text-indigo-400 font-bold">hàng ngàn thiết bị nội bộ</span> đồng thời truy cập Internet chỉ bằng cách dùng chung một địa chỉ IP Public duy nhất.
+                        </li>
+                        <li>
+                            <strong class="text-white">Cơ chế hoạt động:</strong> Sử dụng các <strong class="text-amber-400">số hiệu cổng (Port Number) khác nhau</strong> ở lớp Transport để phân biệt rạch ròi luồng truyền và phiên kết nối của từng máy tính.
+                        </li>
+                    </ul>
+                `
+            },
+            {
+                id: 6,
+                tag: "NAT",
+                question: "Trong cấu hình NAT, giải thích ý nghĩa 4 loại địa chỉ: Inside Local, Inside Global, Outside Local và Outside Global.",
+                answer: `
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm mt-1">
+                        <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-700/50">
+                            <span class="block text-indigo-400 font-bold">Inside Local</span>
+                            <span class="text-slate-300 text-xs">Địa chỉ IP thực tế (thường là IP Private) được gán trực tiếp cho một thiết bị trong mạng LAN nội bộ.</span>
+                        </div>
+                        <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-700/50">
+                            <span class="block text-indigo-400 font-bold">Inside Global</span>
+                            <span class="text-slate-300 text-xs">Địa chỉ IP đại diện (thường là IP Public) của mạng nội bộ để ra ngoài Internet sau khi qua thiết bị NAT.</span>
+                        </div>
+                        <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-700/50">
+                            <span class="block text-amber-400 font-bold">Outside Local</span>
+                            <span class="text-slate-300 text-xs">Địa chỉ IP của thiết bị đích bên ngoài mạng, được nhìn nhận và diễn giải dưới góc nhìn của các thiết bị trong LAN.</span>
+                        </div>
+                        <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-700/50">
+                            <span class="block text-amber-400 font-bold">Outside Global</span>
+                            <span class="text-slate-300 text-xs">Địa chỉ IP công cộng (Public) thực sự của thiết bị nằm ngoài mạng Internet toàn cầu.</span>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 7,
+                tag: "VPN",
+                question: "VPN Site-to-Site vs Remote Access: Phân biệt đối tượng sử dụng.",
+                answer: `
+                    <div class="space-y-4 text-sm">
+                        <div class="bg-slate-900/40 p-3.5 rounded-lg border-l-4 border-teal-500">
+                            <h4 class="font-bold text-teal-400"><i class="fa-solid fa-network-wired mr-1.5"></i> 1. Site-to-Site VPN</h4>
+                            <p class="text-slate-300 mt-1">
+                                Kết nối toàn bộ hệ thống mạng của hai hoặc nhiều chi nhánh cố định với nhau qua Internet (Ví dụ: liên kết trụ sở chính với văn phòng chi nhánh). 
+                            </p>
+                            <p class="text-slate-400 text-xs mt-1">💡 Đặc điểm: Việc đóng gói được thực hiện tự động bởi Router/Firewall ở rìa mạng; các thiết bị đầu cuối của người dùng không cần cài thêm bất kỳ phần mềm VPN nào.</p>
+                        </div>
+                        <div class="bg-slate-900/40 p-3.5 rounded-lg border-l-4 border-indigo-500">
+                            <h4 class="font-bold text-indigo-400"><i class="fa-solid fa-laptop-house mr-1.5"></i> 2. Remote Access VPN</h4>
+                            <p class="text-slate-300 mt-1">
+                                Kết nối các nhân viên làm việc từ xa (làm tại nhà, quán cafe, đi công tác) bảo mật vào mạng nội bộ của doanh nghiệp.
+                            </p>
+                            <p class="text-slate-400 text-xs mt-1">💡 Đặc điểm: Yêu cầu người dùng cuối cài đặt và kích hoạt ứng dụng phần mềm VPN chuyên biệt (như Cisco AnyConnect) để tự khởi tạo đường hầm an toàn.</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 8,
+                tag: "OSPF",
+                question: "Tại sao MTU mismatch khiến OSPF process dừng ở State Exchange? Đây là lỗi gì, lý do xảy ra?",
+                answer: `
+                    <div class="space-y-2 text-sm text-slate-300">
+                        <p><strong class="text-white">Hiện tượng:</strong> Trình trạng OSPF bị đứng (kẹt) ở trạng thái <code class="bg-slate-900 text-indigo-400 px-1 py-0.5 rounded">EXCHANGE</code> hoặc <code class="bg-slate-900 text-indigo-400 px-1 py-0.5 rounded">EXSTART</code>.</p>
+                        <p><strong class="text-white">Tên lỗi:</strong> <span class="text-red-400 font-semibold">Lỗi MTU Mismatch</span> (Sai lệch kích thước đơn vị truyền dẫn tối đa giữa hai cổng kết nối láng giềng).</p>
+                        <p><strong class="text-white">Lý do kỹ thuật:</strong> Router có MTU nhỏ hơn sẽ từ chối nhận các gói tin trao đổi cơ sở dữ liệu liên kết trạng thái (DBD) có kích thước vượt quá ngưỡng của nó, dẫn đến việc hai bên không thể hoàn tất đồng bộ hóa Database LSDB.</p>
+                        <p><strong class="text-white">Nguyên nhân thực tế:</strong> Do lỗi cấu hình thủ công không đồng bộ thông số MTU trên giao diện kết nối trực tiếp giữa hai thiết bị.</p>
+                    </div>
+                `
+            },
+            {
+                id: 9,
+                tag: "OSPF",
+                question: "Multi-area OSPF khác với Single-area OSPF như thế nào? Tại sao vẫn có Area 0 (Backbone Area) tồn tại trong Multi OSPF?",
+                answer: `
+                    <div class="space-y-4">
+                        <p class="text-sm text-slate-300">Sự khác biệt chi tiết được biểu diễn qua bảng so sánh dưới đây:</p>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse border border-slate-700 text-xs">
+                                <thead>
+                                    <tr class="bg-indigo-950 text-indigo-300">
+                                        <th class="border border-slate-700 p-2 font-bold">Tiêu chí so sánh</th>
+                                        <th class="border border-slate-700 p-2 font-bold">Single-area OSPF</th>
+                                        <th class="border border-slate-700 p-2 font-bold">Multi-area OSPF</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-slate-300">
+                                    <tr class="hover:bg-slate-800/50">
+                                        <td class="border border-slate-700 p-2 font-medium bg-slate-900/50">Số area</td>
+                                        <td class="border border-slate-700 p-2">1 (Duy nhất)</td>
+                                        <td class="border border-slate-700 p-2 font-semibold text-emerald-400">Nhiều</td>
+                                    </tr>
+                                    <tr class="hover:bg-slate-800/50">
+                                        <td class="border border-slate-700 p-2 font-medium bg-slate-900/50">Database</td>
+                                        <td class="border border-slate-700 p-2">Dùng chung toàn bộ cho cả mạng</td>
+                                        <td class="border border-slate-700 p-2 text-indigo-300">Riêng biệt cho từng Area</td>
+                                    </tr>
+                                    <tr class="hover:bg-slate-800/50">
+                                        <td class="border border-slate-700 p-2 font-medium bg-slate-900/50">Khả năng mở rộng</td>
+                                        <td class="border border-slate-700 p-2 text-red-400">Thấp</td>
+                                        <td class="border border-slate-700 p-2 font-semibold text-emerald-400">Cao</td>
+                                    </tr>
+                                    <tr class="hover:bg-slate-800/50">
+                                        <td class="border border-slate-700 p-2 font-medium bg-slate-900/50">Độ phức tạp</td>
+                                        <td class="border border-slate-700 p-2">Thấp</td>
+                                        <td class="border border-slate-700 p-2">Cao</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="bg-indigo-950/40 p-3 rounded-lg border border-indigo-900 text-sm">
+                            <strong class="text-indigo-400 block mb-1">Vai trò của Area 0 (Backbone Area):</strong>
+                            <p class="text-slate-300 text-xs leading-relaxed">
+                                Area 0 đóng vai trò bắt buộc là <span class="text-white font-bold underline">CẦU NỐI TRUNG TÂM</span> giữa các vùng (areas) khác nhau. Tất cả lưu lượng dữ liệu liên vùng (inter-area traffic) bắt buộc phải đi xuyên qua Area 0 để tránh tạo vòng lặp định tuyến (routing loop).
+                            </p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 10,
+                tag: "ACL",
+                question: "Tại sao ACL sử dụng Wildcard Mask mà không sử dụng Subnet Mask thông thường?",
+                answer: `
+                    <div class="space-y-2 text-sm text-slate-300">
+                        <p>
+                            <strong class="text-emerald-400">Subnet mask:</strong> Thường được dùng cho việc phân chia vùng mạng con (Network partition). Trong chuỗi nhị phân của Subnet Mask, bit 1 luôn đại diện cho phần mạng (Network ID), và bit 0 là phần Host. Các bit 1 và bit 0 luôn phải đứng liên tục nhau.
+                        </p>
+                        <p>
+                            <strong class="text-indigo-400">Wildcard mask:</strong> Được sử dụng đặc thù cho việc lọc dữ liệu (matching traffic). Trong Wildcard Mask, <span class="text-white font-semibold">bit 0 bắt buộc phải kiểm tra trùng khớp (match)</span>, còn <span class="text-white font-semibold">bit 1 cho phép bỏ qua (ignore - không quan tâm)</span>. Điều này cho phép người quản trị tạo ra các bộ lọc IP linh hoạt hơn (ví dụ lọc các dải IP lẻ hoặc chẵn), điều mà Subnet Mask thông thường không thể làm được.
+                        </p>
+                    </div>
+                `
+            },
+            {
+                id: 11,
+                tag: "IPsec",
+                question: "IPsec gồm những thành phần nào? Giải thích cách thức hoạt động của IPsec?",
+                answer: `
+                    <div class="space-y-4 text-sm text-slate-300">
+                        <div>
+                            <strong class="text-indigo-400 block mb-1">Gồm 4 thành phần trụ cột chính:</strong>
+                            <ul class="list-disc list-inside space-y-1.5 text-xs">
+                                <li><strong class="text-white">AH & ESP:</strong> Chịu trách nhiệm về <strong class="text-emerald-400">Xác thực (Authentication)</strong> dữ liệu và mã hóa.</li>
+                                <li><strong class="text-white">IKE & PSK:</strong> Chịu trách nhiệm cho việc thiết lập cấu hình bảo mật tự động và <strong class="text-emerald-400">Khai báo/Xác minh tài khoản (Accounting)</strong>.</li>
+                                <li><strong class="text-white">MD5 / SHA:</strong> Thuật toán băm dùng để kiểm tra và đảm bảo <strong class="text-emerald-400">Tính toàn vẹn của gói tin (HASH)</strong>.</li>
+                                <li><strong class="text-white">Diffie-Hellman (DH):</strong> <strong class="text-emerald-400">Thuật toán (Algorithm)</strong> trao đổi khóa mã hóa một cách an toàn qua kênh công cộng.</li>
+                            </ul>
+                        </div>
+                        <div class="bg-slate-900 p-3 rounded-lg border border-slate-700">
+                            <strong class="text-white block mb-1">Cách thức hoạt động:</strong>
+                            <p class="text-xs leading-relaxed">
+                                IPsec đàm phán các phương pháp mã hóa và xác thực bảo mật giữa hai thiết bị truyền nhận thông qua một kênh đường ống ảo bảo mật gọi là <strong class="text-indigo-400">Đường hầm (Tunnel)</strong> được thống nhất xây dựng từ trước.
+                            </p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 12,
+                tag: "VPN",
+                question: "Giao thức Tunnel nào không có cơ chế bảo mật mà phải phụ thuộc vào IPsec trong quá trình xây dựng VPN tunnel?",
+                answer: `
+                    <p class="text-sm text-slate-300 leading-relaxed">
+                        Giao thức đó chính là <span class="text-amber-400 font-black text-base">GRE (Generic Routing Encapsulation)</span>.
+                    </p>
+                    <div class="bg-amber-950/30 border border-amber-900/50 rounded-lg p-3 my-2 text-xs text-amber-200">
+                        <strong>Lý do:</strong> GRE có khả năng đóng gói nhiều giao thức lớp mạng khác nhau và hỗ trợ lưu lượng Multicast/Broadcast (rất hữu ích cho chạy định tuyến qua VPN), tuy nhiên nó truyền dữ liệu dạng văn bản thuần (Clear Text) không có bảo mật hay mã hóa dữ liệu. Do đó, người ta bắt buộc phải cấu hình thêm <strong class="text-white">IPsec để bảo vệ an toàn cho luồng Tunnel GRE này</strong> (Giải pháp GRE over IPsec).
+                    </div>
+                `
+            },
+            {
+                id: 13,
+                tag: "OSPF",
+                question: "Tại sao quản trị viên mạng thường thay đổi giá trị mặc định của Reference Bandwidth trong cách tính Cost của OSPFv2?",
+                answer: `
+                    <div class="space-y-2 text-sm text-slate-300">
+                        <p>
+                            Theo mặc định ban đầu của Cisco, Reference Bandwidth được thiết lập cố định là <strong class="text-white">100 Mbps ($10^8$ bps)</strong>.
+                        </p>
+                        <p class="text-red-400">
+                            🚨 Vấn đề bất cập: Với hạ tầng mạng hiện tại, các đường truyền Gigabit Ethernet (1 Gbps) hoặc 10-Gigabit Ethernet (10 Gbps) cực kỳ phổ biến. Nếu dùng giá trị mặc định, các giao diện FastEthernet (100M), Gigabit (1G) và 10G đều có Cost được làm tròn thành <strong class="text-white font-mono">1</strong>. OSPF sẽ không thể phân biệt được đường truyền nào nhanh hơn để tối ưu định tuyến.
+                        </p>
+                        <p class="text-emerald-400">
+                            → Giải pháp: Người quản trị đổi giá trị Reference Bandwidth mặc định lên cao hơn, ví dụ đặt thành 10 Gbps ($10^{10}$ bps) để OSPF có thể tính toán chính xác giá trị Cost phân biệt cho các đường tốc độ cao.
+                        </p>
+                    </div>
+                `
+            },
+            {
+                id: 14,
+                tag: "NAT",
+                question: "Khi cấu hình Dynamic NAT, người quản trị cấu hình thêm 2 ACL, vậy các ACL này đóng vai trò gì?",
+                answer: `
+                    <p class="text-sm text-slate-300 leading-relaxed">
+                        Trong cấu hình Dynamic NAT, danh sách kiểm soát truy cập (ACL) đóng vai trò là một <strong class="text-indigo-400">Bộ nhận diện (Classifier)</strong>.
+                    </p>
+                    <div class="bg-slate-900/80 border border-slate-700 rounded-lg p-3 my-2 text-xs text-slate-300">
+                        <strong>Chức năng cụ thể:</strong> ACL được dùng để lọc và xác định cụ thể các lưu lượng IP nội bộ nào (Inside Local) được phép hoặc không được phép chuyển đổi địa chỉ thành IP công cộng (Inside Global) để đi ra ngoài Internet.
+                    </div>
+                `
+            },
+            {
+                id: 15,
+                tag: "IPsec",
+                question: "Thuật toán mã hóa AES/DES/3DES hoạt động như thế nào để bảo đảm IPsec có thể cung cấp an toàn cho dữ liệu truyền tải?",
+                answer: `
+                    <div class="space-y-2 text-sm text-slate-300">
+                        <p>Các thuật toán này hoạt động bằng cách:</p>
+                        <ul class="list-disc list-inside space-y-1 bg-slate-900 p-3 rounded-lg border border-slate-700 text-xs font-mono text-indigo-300">
+                            <li>Nhận đầu vào là luồng dữ liệu thô (Clear Text).</li>
+                            <li>Áp dụng các hàm toán học phức tạp kết hợp với khóa bí mật để xáo trộn dữ liệu.</li>
+                            <li><span class="text-white font-bold">Biến đổi dữ liệu cần bảo mật thành một chuỗi bits mới có độ dài cố định biết trước</span> (Ví dụ: AES 128-bits, 256-bits...).</li>
+                        </ul>
+                        <p class="text-xs text-slate-400">Chỉ có thiết bị nhận có đúng khóa bí mật giải mã tương ứng mới có thể đưa chuỗi bit mã hóa phức tạp này trở lại thành dữ liệu gốc đọc được.</p>
+                    </div>
+                `
+            },
+            {
+                id: 16,
+                tag: "NAT",
+                question: "NAT Overload có thể cung cấp tối đa bao nhiêu kết nối tại một thời điểm? Điều gì xảy ra khi vượt quá giới hạn đó?",
+                answer: `
+                    <div class="space-y-3 text-sm text-slate-300">
+                        <p>
+                            <strong class="text-white">Số lượng kết nối tối đa:</strong> Về mặt lý thuyết, NAT Overload sử dụng trường Port Number 16-bit nên có thể cung cấp tối đa <span class="text-indigo-400 font-black">65.535 kết nối</span> đồng thời cho các thiết bị trong mạng LAN.
+                        </p>
+                        <div class="bg-red-950/30 border border-red-900/50 p-3 rounded-lg text-xs text-red-200">
+                            <strong class="block mb-1">🚨 Điều xảy ra khi vượt quá số lượng tối đa:</strong>
+                            Các yêu cầu kết nối truy cập Internet phát sinh vượt quá giới hạn này sẽ bị chặn và đưa vào hàng đợi. Người dùng phải chờ cho đến khi có một kết nối hiện tại hoàn tất và giải phóng số hiệu cổng rảnh rỗi mới có thể truy cập được tiếp.
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 17,
+                tag: "LAN-WAN",
+                question: "Mô tả các đặc điểm khác biệt cơ bản giữa mạng LAN và mạng WAN?",
+                answer: `
+                    <p class="text-sm text-slate-300 mb-3">Sự khác biệt rõ nét nhất giữa mạng nội bộ (LAN) và mạng diện rộng (WAN):</p>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse border border-slate-700 text-xs">
+                            <thead>
+                                <tr class="bg-rose-950 text-rose-300">
+                                    <th class="border border-slate-700 p-2.5 font-bold">Tiêu chí</th>
+                                    <th class="border border-slate-700 p-2.5 font-bold">Mạng LAN</th>
+                                    <th class="border border-slate-700 p-2.5 font-bold">Mạng WAN</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-slate-300">
+                                <tr class="hover:bg-slate-800/50">
+                                    <td class="border border-slate-700 p-2 font-medium bg-slate-900/50">Phạm vi địa lý</td>
+                                    <td class="border border-slate-700 p-2">Quy mô hẹp: Doanh nghiệp, gia đình, tòa nhà</td>
+                                    <td class="border border-slate-700 p-2 text-indigo-300 font-semibold">Quy mô rộng: Giữa các quốc gia, vùng địa lý, lục địa</td>
+                                </tr>
+                                <tr class="hover:bg-slate-800/50">
+                                    <td class="border border-slate-700 p-2 font-medium bg-slate-900/50">Độ trễ (Latency)</td>
+                                    <td class="border border-slate-700 p-2 text-emerald-400 font-semibold">Thấp</td>
+                                    <td class="border border-slate-700 p-2 text-red-400">Cao</td>
+                                </tr>
+                                <tr class="hover:bg-slate-800/50">
+                                    <td class="border border-slate-700 p-2 font-medium bg-slate-900/50">Tốc độ (Speed)</td>
+                                    <td class="border border-slate-700 p-2 text-emerald-400 font-semibold">Tốc độ cao</td>
+                                    <td class="border border-slate-700 p-2">Tốc độ dễ bị ảnh hưởng rõ rệt theo khoảng cách vật lý</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `
+            },
+            {
+                id: 18,
+                tag: "OSPF",
+                question: "Thông thường, OSPF lựa chọn đường đi tối ưu theo quy tắc gì? Nếu thông số quan trọng nhất bằng nhau thì cơ chế nào sẽ được kích hoạt?",
+                answer: `
+                    <div class="space-y-2 text-sm text-slate-300">
+                        <p>
+                            <strong class="text-white">Quy tắc lựa chọn:</strong> OSPF luôn luôn chọn đường dẫn đi qua các Router có <span class="text-indigo-400 font-bold">tổng giá trị Metric (Cost) tích lũy trên đường truyền là thấp nhất</span>.
+                        </p>
+                        <p class="text-emerald-400">
+                            💡 Trường hợp Cost bằng nhau: OSPF sẽ tự động kích hoạt cơ chế <strong class="text-white">ECMP (Equal Cost Multi Path)</strong> để thực hiện <strong class="text-white">Cân bằng tải (Load-balancing)</strong> trên các đường truyền song song đó, giúp tối ưu hóa lưu lượng tải qua mạng.
+                        </p>
+                    </div>
+                `
+            },
+            {
+                id: 19,
+                tag: "ACL",
+                question: "Những lưu ý cốt lõi nào cần nhớ khi cấu hình ACL để tránh tình trạng lỗi hệ thống mạng?",
+                answer: `
+                    <div class="space-y-2 text-sm text-slate-300">
+                        <p class="text-amber-400 font-bold">🚨 Nguyên lý so sánh của ACL:</p>
+                        <p>ACL luôn xử lý và so sánh tuần tự từng dòng lệnh một theo thứ tự từ trên xuống dưới (Dòng nhập trước được đọc trước, dòng nhập sau đọc sau).</p>
+                        <p class="text-emerald-400 font-bold">💡 Lưu ý cấu hình vàng:</p>
+                        <p>Cần ưu tiên viết cấu hình các câu lệnh cho phép <span class="text-white bg-emerald-950 px-1.5 py-0.5 rounded font-mono">Permit</span> chi tiết hơn ở dòng phía trên và các câu lệnh ngăn chặn chung <span class="text-white bg-red-950 px-1.5 py-0.5 rounded font-mono">Deny</span> ở phía bên dưới để tránh trường hợp lưu lượng hợp lệ bị chặn ngay trước khi kiểm tra dòng Permit.</p>
+                    </div>
+                `
+            },
+            {
+                id: 20,
+                tag: "NAT",
+                question: "Nêu 3 nhược điểm nổi bật nhất của cơ chế NAT?",
+                answer: `
+                    <ol class="list-decimal list-inside space-y-2 text-sm text-slate-300">
+                        <li>
+                            <strong class="text-white">Giảm hiệu năng (Performance):</strong> Thiết bị định tuyến (Router) phải liên tục kiểm tra, chỉnh sửa IP và tính toán lại checksum tiêu đề gói tin lớp Layer 3 khiến CPU/RAM bị quá tải.
+                        </li>
+                        <li>
+                            <strong class="text-white">Mất tính kết nối End-to-End:</strong> Làm mất đi tính toàn vẹn thông tin IP gốc, gây khó khăn cho các ứng dụng đòi hỏi tính kết nối điểm-điểm thông suốt (Ví dụ: cuộc gọi VoIP, Game trực tuyến, VPN bảo mật).
+                        </li>
+                        <li>
+                            <strong class="text-white font-semibold">Gây khó khăn khi giải quyết sự cố (Troubleshooting):</strong> Do IP nguồn liên tục thay đổi, người quản trị rất khó tra cứu logs để tìm ra thiết bị thực tế bị lỗi trong mạng nội bộ.
+                        </li>
+                    </ol>
+                `
+            },
+            {
+                id: 21,
+                tag: "VPN",
+                question: "Mô tả hoạt động tạo đường hầm kết nối VPN bằng giao thức GRE (Cú pháp lệnh mẫu)?",
+                answer: `
+                    <div class="space-y-2">
+                        <p class="text-sm text-slate-300">Để xây dựng đường hầm kết nối VPN bằng giao thức GRE, người quản trị thực hiện tuần tự các câu lệnh cấu hình sau:</p>
+                        <pre class="bg-slate-950 p-4 rounded-lg text-xs font-mono text-emerald-400 overflow-x-auto leading-relaxed border border-slate-800">
+Router(config)# interface tunnel [id tunnel]
+Router(config-if)# tunnel mode GRE ip
+Router(config-if)# ip address [địa chỉ ipv4] [subnet mask]
+Router(config-if)# tunnel source [địa chỉ cổng ra internet]
+Router(config-if)# tunnel destination [địa chỉ kết nối đến cổng ra internet]</pre>
+                    </div>
+                `
+            },
+            {
+                id: 22,
+                tag: "OSPF",
+                question: "OSPF chạy qua tổng cộng bao nhiêu STATE? Nêu hoạt động tóm tắt của từng state trong OSPFv2?",
+                answer: `
+                    <div class="space-y-1.5 text-xs text-slate-300">
+                        <p><strong class="text-indigo-400">1. Down:</strong> Thiết bị chưa khởi động (hoặc chưa cắm dây cáp vật lý).</p>
+                        <p><strong class="text-indigo-400">2. Init:</strong> Gửi đi bản tin Hello định kỳ ra cổng mạng để tìm láng giềng.</p>
+                        <p><strong class="text-indigo-400">3. Two-way:</strong> Nhận phản hồi Hello từ láng giềng chứa Router ID của chính mình (Đồng ý thiết lập quan hệ láng giềng, thực hiện bầu DR/BDR).</p>
+                        <p><strong class="text-indigo-400">4. Ex-start:</strong> Quyết định xem thiết bị nào sẽ gửi dữ liệu mô tả Database trước (Bầu Master/Slave).</p>
+                        <p><strong class="text-indigo-400">5. Exchange:</strong> Tiến hành gửi các bản tin mô tả cơ sở dữ liệu (DBD) cho nhau.</p>
+                        <p><strong class="text-indigo-400">6. Loading:</strong> Yêu cầu thêm thông tin chi tiết (LSR), phản hồi cập nhật (LSU) để đồng bộ hoàn toàn LSDB của cá nhân.</p>
+                        <p><strong class="text-emerald-400">7. Full (Forwarding):</strong> Hoàn tất đồng bộ hóa cơ sở dữ liệu và sẵn sàng chuyển tiếp gói tin dữ liệu qua đường định tuyến.</p>
+                    </div>
+                `
+            },
+            {
+                id: 23,
+                tag: "ACL",
+                question: "Name ACL có ưu điểm và khuyết điểm gì so với Number ACL? Điểm đặc biệt của dòng Cisco Series 3000 là gì?",
+                answer: `
+                    <div class="space-y-4">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse border border-slate-700 text-xs">
+                                <thead>
+                                    <tr class="bg-slate-950 text-indigo-300">
+                                        <th class="border border-slate-700 p-2 font-bold">Đặc điểm</th>
+                                        <th class="border border-slate-700 p-2 font-bold">Name ACL (Dùng Tên)</th>
+                                        <th class="border border-slate-700 p-2 font-bold">Number ACL (Dùng Số)</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-slate-300">
+                                    <tr class="hover:bg-slate-800/50">
+                                        <td class="border border-slate-700 p-2 font-medium bg-slate-900/50">Sắp xếp ACE</td>
+                                        <td class="border border-slate-700 p-2 font-semibold text-emerald-400">Sắp xếp được thứ tự ACE một cách linh hoạt</td>
+                                        <td class="border border-slate-700 p-2 text-red-400">Không thể sắp xếp (Nhập trước ở trên, nhập sau ở dưới)</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="bg-indigo-950/40 p-3 rounded-lg border border-indigo-900/80 text-sm">
+                            <strong class="text-indigo-400 block mb-1">💡 Điểm đặc biệt trên thiết bị Switch L3 Series 3000:</strong>
+                            <p class="text-slate-300 text-xs leading-relaxed">
+                                Cho phép người quản trị gán/áp dụng trực tiếp chính sách của ACL lên trên giao diện cổng <strong class="text-white">Interface VLAN</strong>, tăng khả năng quản trị lưu lượng định tuyến nội bộ liên VLAN hiệu quả.
+                            </p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 24,
+                tag: "NAT",
+                question: "Cơ chế NAT ra đời khi nào? Giải quyết vấn đề gì? Viết câu lệnh cấu hình Static NAT trên dòng Series 3000?",
+                answer: `
+                    <div class="space-y-3 text-sm text-slate-300">
+                        <p>
+                            <strong class="text-white">Năm ra đời:</strong> Được phát triển vào năm <span class="text-indigo-400 font-bold">1994</span>.
+                        </p>
+                        <p>
+                            <strong class="text-white">Sứ mệnh cốt lõi:</strong> Giải quyết triệt để vấn đề cạn kiệt dải địa chỉ IPv4 toàn cầu trong khi chờ đợi triển khai IPv6.
+                        </p>
+                        <div>
+                            <strong class="text-white block mb-1">Cú pháp cấu hình Static NAT mẫu:</strong>
+                            <pre class="bg-slate-950 p-4 rounded-lg text-xs font-mono text-emerald-400 overflow-x-auto leading-relaxed border border-slate-800">
+Router(config)# ip nat inside source static [inside local] [inside global]
+Router(config)# interface [Cổng kết nối về mạng nội bộ]
+Router(config-if)# ip nat inside
+Router(config)# interface [Cổng kết nối ra mạng bên ngoài]
+Router(config-if)# ip nat outside</pre>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 25,
+                tag: "IPsec",
+                question: "Sự khác biệt của 2 cơ chế ESP và AH trong VPN? Tại sao VPN Site-to-Site lại sử dụng ESP thay vì AH?",
+                answer: `
+                    <div class="space-y-4">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse border border-slate-700 text-xs">
+                                <thead>
+                                    <tr class="bg-slate-950 text-indigo-300">
+                                        <th class="border border-slate-700 p-2 font-bold">Tiêu chí</th>
+                                        <th class="border border-slate-700 p-2 font-bold">Cơ chế AH</th>
+                                        <th class="border border-slate-700 p-2 font-bold">Cơ chế ESP</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-slate-300">
+                                    <tr class="hover:bg-slate-800/50">
+                                        <td class="border border-slate-700 p-2 font-medium bg-slate-900/50">Mã hóa (Encryption)</td>
+                                        <td class="border border-slate-700 p-2 text-red-400">Không mã hóa dữ liệu</td>
+                                        <td class="border border-slate-700 p-2 font-semibold text-emerald-400">Có mã hóa dữ liệu (Tính bảo mật cao)</td>
+                                    </tr>
+                                    <tr class="hover:bg-slate-800/50">
+                                        <td class="border border-slate-700 p-2 font-medium bg-slate-900/50">NAT</td>
+                                        <td class="border border-slate-700 p-2 text-red-400">Gây ảnh hưởng nghiêm trọng đến quá trình NAT</td>
+                                        <td class="border border-slate-700 p-2 font-semibold text-emerald-400">Không ảnh hưởng đến quá trình NAT</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="bg-emerald-950/40 p-3 rounded-lg border border-emerald-900 text-sm">
+                            <strong class="text-emerald-400 block mb-1">Lý do VPN Site-to-Site sử dụng ESP:</strong>
+                            <p class="text-slate-300 text-xs leading-relaxed">
+                                Đối với doanh nghiệp, tính bảo mật và mã hóa luồng dữ liệu truyền trên Internet là quan trọng nhất. Vì vậy, họ luôn ưu tiên chọn <span class="text-white font-bold">ESP</span> bởi vì nó cung cấp khả năng mã hóa nội dung gói tin cực mạnh, bảo vệ tuyệt đối thông tin nhạy cảm.
+                            </p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 26,
+                tag: "OSPF",
+                question: "Tại sao quản trị viên thường dùng địa chỉ Loopback làm Router ID cho OSPF thay vì cổng vật lý?",
+                answer: `
+                    <div class="space-y-3 text-sm text-slate-300">
+                        <div class="bg-slate-900 p-3 rounded-lg border border-slate-700">
+                            <strong class="text-emerald-400 block mb-1">👍 Tính ổn định tuyệt đối:</strong>
+                            Cổng ảo Loopback có đặc tính <strong class="text-white">luôn luôn trong trạng thái hoạt động (Up)</strong>. Giao diện này không bao giờ bị tắt (Shutdown) trừ khi toàn bộ phần cứng vật lý của Router bị hỏng hoặc mất nguồn.
+                        </div>
+                        <div class="bg-red-950/20 border border-red-900/50 p-3 rounded-lg">
+                            <strong class="text-red-400 block mb-1">🚨 Nguy cơ khi dùng cổng vật lý:</strong>
+                            Nếu sử dụng ID dựa trên IP của cổng vật lý, khi cổng đó gặp sự cố vật lý (đứt cáp, cổng lỗi) và bị Shutdown, Router buộc phải thực hiện tính toán lại toàn bộ tiến trình OSPF và quảng bá cập nhật lại cho tất cả các router trong vùng, gây gián đoạn luồng dữ liệu mạng.
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 27,
+                tag: "OSPF",
+                question: "Trong OSPF, câu lệnh nào giúp Router quảng bá Default Route cho các Router còn lại?",
+                answer: `
+                    <div class="space-y-2">
+                        <p class="text-sm text-slate-300">Để một Router tự động phân phối (quảng bá) một đường đi mặc định (Default Route) đã thiết lập tới tất cả các Router OSPF láng giềng khác, người quản trị dùng cú pháp lệnh:</p>
+                        <pre class="bg-slate-950 p-4 rounded-lg text-xs font-mono text-emerald-400 overflow-x-auto leading-relaxed border border-slate-800">
+Router(config)# router ospf [process id]
+Router(config-router)# default-information originate</pre>
+                    </div>
+                `
+            }
+        ];
+
+        // State Manager
+        let currentTab = 'all-list';
+        let masteredCards = JSON.parse(localStorage.getItem('cisco_mastered_cards')) || [];
+        
+        // Flashcard State
+        let flashcardDeck = [...questionsDB];
+        let currentFCIndex = 0;
+        let isFlipped = false;
+
+        // Exam State
+        let currentExamQuestions = [];
+        let examUserAnswers = {};
+        let examScores = {};
+
+        // App Init on load
+        window.onload = function() {
+            renderAllQuestionsList();
+            updateGlobalStats();
+            initFlashcardMode();
+        }
+
+        // Tab Switcher
+        function switchTab(tabId) {
+            currentTab = tabId;
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-tab').forEach(el => {
+                el.classList.remove('text-indigo-400', 'bg-indigo-500/10');
+                el.classList.add('text-slate-400', 'hover:text-white', 'hover:bg-slate-800');
+            });
+
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`btn-${tabId}`);
+            activeBtn.classList.remove('text-slate-400', 'hover:text-white', 'hover:bg-slate-800');
+            activeBtn.classList.add('text-indigo-400', 'bg-indigo-500/10');
+
+            if (tabId === 'flashcard-mode') {
+                updateFlashcardUI();
+            }
+        }
+
+        // Global Stats Updates
+        function updateGlobalStats() {
+            document.getElementById('stat-mastered').innerText = masteredCards.length;
+            const percent = Math.round((masteredCards.length / questionsDB.length) * 100);
+            document.getElementById('stat-percent').innerText = `${percent}%`;
+            localStorage.setItem('cisco_mastered_cards', JSON.stringify(masteredCards));
+        }
+
+        // TAB 1: RENDER ALL QUESTIONS
+        function renderAllQuestionsList() {
+            const container = document.getElementById('questions-list-container');
+            container.innerHTML = '';
+
+            questionsDB.forEach(q => {
+                const isMastered = masteredCards.includes(q.id);
+                const itemHTML = `
+                    <div id="q-card-${q.id}" class="bg-slate-850/80 border ${isMastered ? 'border-emerald-500/40 bg-emerald-950/5' : 'border-slate-800'} rounded-xl p-5 hover:border-slate-700 transition-all shadow-sm">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="bg-slate-800 text-slate-400 border border-slate-700 px-2.5 py-0.5 rounded text-xs font-bold font-mono">
+                                    CÂU ${q.id}
+                                </span>
+                                <span class="bg-indigo-900/40 text-indigo-300 border border-indigo-800/40 px-2 py-0.5 rounded text-xs font-semibold">
+                                    ${q.tag}
+                                </span>
+                            </div>
+                            <button onclick="toggleMasteredList(${q.id})" class="text-xs self-start sm:self-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg border transition-colors ${isMastered ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/20' : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-white hover:bg-slate-700'}">
+                                <i class="fa-solid ${isMastered ? 'fa-check-double' : 'fa-check'}"></i>
+                                <span>${isMastered ? 'Đã thuộc lòng' : 'Đánh dấu đã thuộc'}</span>
+                            </button>
+                        </div>
+                        <h3 class="text-base font-bold text-white mb-3 flex items-start gap-1">
+                            ${q.question}
+                        </h3>
+                        <div class="bg-slate-900/60 p-4 rounded-lg border border-slate-800/80 text-sm text-slate-300">
+                            ${q.answer}
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += itemHTML;
+            });
+        }
+
+        // Toggle Mastered state in List
+        function toggleMasteredList(id) {
+            if (masteredCards.includes(id)) {
+                masteredCards = masteredCards.filter(x => x !== id);
+            } else {
+                masteredCards.push(id);
+            }
+            updateGlobalStats();
+            renderAllQuestionsList();
+        }
+
+        // Search Filter for Question List
+        function filterQuestions() {
+            const query = document.getElementById('search-input').value.toLowerCase().trim();
+            questionsDB.forEach(q => {
+                const element = document.getElementById(`q-card-${q.id}`);
+                const matchText = (q.id + " " + q.question + " " + q.tag).toLowerCase();
+                if (matchText.includes(query)) {
+                    element.classList.remove('hidden');
+                } else {
+                    element.classList.add('hidden');
+                }
+            });
+        }
+
+        // TAB 2: FLASHCARD MODE LOGIC
+        function initFlashcardMode() {
+            currentFCIndex = 0;
+            isFlipped = false;
+            document.getElementById('main-flashcard').classList.remove('flipped');
+        }
+
+        function updateFlashcardUI() {
+            if (flashcardDeck.length === 0) {
+                document.getElementById('fc-question').innerHTML = "<span class='text-emerald-400'>🎉 Tuyệt vời! Bạn đã thuộc toàn bộ câu hỏi.</span>";
+                document.getElementById('fc-answer').innerHTML = "<p class='text-center text-slate-400'>Bấm vào nút 'Học lại từ đầu' ở dưới để ôn tập lại.</p>";
+                document.getElementById('fc-card-num').innerText = "HOÀN THÀNH";
+                document.getElementById('fc-card-num-back').innerText = "HOÀN THÀNH";
+                return;
+            }
+
+            if (currentFCIndex >= flashcardDeck.length) {
+                currentFCIndex = 0;
+            }
+
+            const currentCard = flashcardDeck[currentFCIndex];
+            const isMastered = masteredCards.includes(currentCard.id);
+
+            document.getElementById('fc-card-num').innerText = `THẺ SỐ ${currentFCIndex + 1}/${flashcardDeck.length}`;
+            document.getElementById('fc-card-num-back').innerText = `CÂU TRẢ LỜI SỐ ${currentCard.id}`;
+            document.getElementById('fc-question').innerText = currentCard.question;
+            document.getElementById('fc-answer').innerHTML = currentCard.answer;
+
+            // Update Mastered button status
+            const masterBtn = document.getElementById('btn-master');
+            if (isMastered) {
+                masterBtn.className = "bg-amber-600 hover:bg-amber-500 active:scale-95 text-white p-3 rounded-xl font-medium transition-all flex items-center justify-center gap-2 shadow-lg shadow-amber-600/20";
+                masterBtn.innerHTML = '<i class="fa-solid fa-rotate-left text-lg"></i> <span class="hidden sm:inline">Chưa thuộc câu này</span>';
+            } else {
+                masterBtn.className = "bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white p-3 rounded-xl font-medium transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20";
+                masterBtn.innerHTML = '<i class="fa-solid fa-check text-lg"></i> <span class="hidden sm:inline">Đã thuộc câu này</span>';
+            }
+        }
+
+        function flipCard() {
+            isFlipped = !isFlipped;
+            const cardEl = document.getElementById('main-flashcard');
+            if (isFlipped) {
+                cardEl.classList.add('flipped');
+            } else {
+                cardEl.classList.remove('flipped');
+            }
+        }
+
+        function nextCard() {
+            if (flashcardDeck.length === 0) return;
+            isFlipped = false;
+            document.getElementById('main-flashcard').classList.remove('flipped');
+            setTimeout(() => {
+                currentFCIndex = (currentFCIndex + 1) % flashcardDeck.length;
+                updateFlashcardUI();
+            }, 150);
+        }
+
+        function prevCard() {
+            if (flashcardDeck.length === 0) return;
+            isFlipped = false;
+            document.getElementById('main-flashcard').classList.remove('flipped');
+            setTimeout(() => {
+                currentFCIndex = (currentFCIndex - 1 + flashcardDeck.length) % flashcardDeck.length;
+                updateFlashcardUI();
+            }, 150);
+        }
+
+        function markAsMastered() {
+            if (flashcardDeck.length === 0) return;
+            const currentCard = flashcardDeck[currentFCIndex];
+            
+            if (masteredCards.includes(currentCard.id)) {
+                // If already mastered, unmaster it
+                masteredCards = masteredCards.filter(x => x !== currentCard.id);
+            } else {
+                // Master it
+                masteredCards.push(currentCard.id);
+            }
+            updateGlobalStats();
+            renderAllQuestionsList();
+            updateFlashcardUI();
+        }
+
+        function shuffleDeck() {
+            isFlipped = false;
+            document.getElementById('main-flashcard').classList.remove('flipped');
+            setTimeout(() => {
+                for (let i = flashcardDeck.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [flashcardDeck[i], flashcardDeck[j]] = [flashcardDeck[j], flashcardDeck[i]];
+                }
+                currentFCIndex = 0;
+                updateFlashcardUI();
+                showCustomAlert("🎲 Trộn thẻ thành công!", "Toàn bộ thẻ học đã được đảo lộn vị trí ngẫu nhiên.", "success");
+            }, 150);
+        }
+
+        function resetMasteredStatus() {
+            showCustomConfirm("Xác nhận học lại", "Bạn muốn đưa tất cả câu hỏi về trạng thái chưa thuộc ban đầu?", () => {
+                masteredCards = [];
+                updateGlobalStats();
+                flashcardDeck = [...questionsDB];
+                currentFCIndex = 0;
+                isFlipped = false;
+                document.getElementById('main-flashcard').classList.remove('flipped');
+                renderAllQuestionsList();
+                updateFlashcardUI();
+            });
+        }
+
+
+        // TAB 3: EXAM MODE LOGIC
+        function startExam() {
+            // Pick 5 random questions
+            const shuffled = [...questionsDB].sort(() => 0.5 - Math.random());
+            currentExamQuestions = shuffled.slice(0, 5);
+            examUserAnswers = {};
+            examScores = {};
+
+            document.getElementById('exam-start-screen').classList.add('hidden');
+            document.getElementById('exam-running-screen').classList.remove('hidden');
+            document.getElementById('exam-results-board').classList.add('hidden');
+            document.getElementById('exam-actions').classList.remove('hidden');
+
+            const examContainer = document.getElementById('exam-questions-list');
+            examContainer.innerHTML = '';
+
+            currentExamQuestions.forEach((q, index) => {
+                examContainer.innerHTML += `
+                    <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 space-y-4">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs bg-indigo-500/20 text-indigo-300 font-bold px-2.5 py-1 rounded-md">
+                                CÂU HỎI THI SỐ ${index + 1} (CÂU ${q.id})
+                            </span>
+                        </div>
+                        <h4 class="text-base font-bold text-white">${q.question}</h4>
+                        
+                        <!-- User Input -->
+                        <div id="exam-user-input-block-${index}">
+                            <textarea id="exam-ans-text-${index}" rows="4" placeholder="Nhập câu trả lời tự luận của bạn tại đây để kiểm tra..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-sm text-slate-100 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 placeholder-slate-500"></textarea>
+                        </div>
+
+                        <!-- Side by Side Review (Initially Hidden) -->
+                        <div id="exam-review-block-${index}" class="hidden space-y-4 pt-3 border-t border-slate-700/50">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-700">
+                                    <span class="block text-xs text-slate-400 font-bold mb-1">✍️ Bài làm của bạn:</span>
+                                    <p id="exam-ans-user-display-${index}" class="text-sm text-slate-300 whitespace-pre-wrap italic"></p>
+                                </div>
+                                <div class="bg-emerald-950/20 p-3 rounded-lg border border-emerald-900/50">
+                                    <span class="block text-xs text-emerald-400 font-bold mb-1">🎯 Đáp án mẫu của giảng viên:</span>
+                                    <div class="text-sm text-slate-300 overflow-x-auto">${q.answer}</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Interative Self Grading -->
+                            <div class="flex items-center gap-3 bg-slate-900/40 p-3 rounded-lg border border-slate-800 justify-between">
+                                <span class="text-xs text-slate-300 font-medium">Bạn có đạt được đúng ý chính không?</span>
+                                <div class="flex gap-2">
+                                    <button onclick="gradeQuestion(${index}, false)" id="grade-fail-btn-${index}" class="bg-slate-800 hover:bg-slate-700 text-slate-400 text-xs px-3 py-1.5 rounded-lg border border-slate-700 flex items-center gap-1.5 transition-colors">
+                                        <i class="fa-regular fa-circle-xmark"></i> Chưa đúng
+                                    </button>
+                                    <button onclick="gradeQuestion(${index}, true)" id="grade-pass-btn-${index}" class="bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600/30 text-xs px-3 py-1.5 rounded-lg border border-emerald-500/30 flex items-center gap-1.5 transition-colors">
+                                        <i class="fa-regular fa-circle-check"></i> Đạt yêu cầu
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function confirmResetExam() {
+            showCustomConfirm("Đổi đề mới", "Bạn có chắc chắn muốn làm mới đề và bắt đầu một bài thi thử khác?", () => {
+                startExam();
+            });
+        }
+
+        function submitExam() {
+            // Populate answers and flip UI
+            currentExamQuestions.forEach((q, index) => {
+                const userText = document.getElementById(`exam-ans-text-${index}`).value.trim();
+                examUserAnswers[index] = userText || "(Bạn đã để trống câu trả lời này)";
+                
+                // Set text for preview
+                document.getElementById(`exam-ans-user-display-${index}`).innerText = examUserAnswers[index];
+                
+                // Toggle Blocks
+                document.getElementById(`exam-user-input-block-${index}`).classList.add('hidden');
+                document.getElementById(`exam-review-block-${index}`).classList.remove('hidden');
+
+                // Default grade as fail initially till they click
+                examScores[index] = false;
+            });
+
+            document.getElementById('exam-actions').classList.add('hidden');
+            document.getElementById('exam-results-board').classList.remove('hidden');
+            calculateExamResult();
+            
+            // Scroll to top of board
+            document.getElementById('exam-results-board').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function gradeQuestion(index, pass) {
+            examScores[index] = pass;
+            
+            const passBtn = document.getElementById(`grade-pass-btn-${index}`);
+            const failBtn = document.getElementById(`grade-fail-btn-${index}`);
+
+            if (pass) {
+                passBtn.className = "bg-emerald-600 text-white text-xs px-3 py-1.5 rounded-lg border border-emerald-500 flex items-center gap-1.5 transition-colors";
+                failBtn.className = "bg-slate-800 text-slate-400 text-xs px-3 py-1.5 rounded-lg border border-slate-700 flex items-center gap-1.5 transition-colors";
+            } else {
+                passBtn.className = "bg-emerald-600/20 text-emerald-400 text-xs px-3 py-1.5 rounded-lg border border-emerald-500/30 flex items-center gap-1.5 transition-colors";
+                failBtn.className = "bg-red-600 text-white text-xs px-3 py-1.5 rounded-lg border border-red-500 flex items-center gap-1.5 transition-colors";
+            }
+
+            calculateExamResult();
+        }
+
+        function calculateExamResult() {
+            let passedCount = 0;
+            for (let i = 0; i < 5; i++) {
+                if (examScores[i] === true) passedCount++;
+            }
+            document.getElementById('exam-score').innerText = `${passedCount} / 5`;
+        }
+
+        // Custom Modal Utilities (replaces standard alerts)
+        let modalActionCallback = null;
+
+        function showCustomAlert(title, desc, type = "info") {
+            const modal = document.getElementById('custom-modal');
+            const icon = document.getElementById('modal-icon');
+            const titleEl = document.getElementById('modal-title');
+            const descEl = document.getElementById('modal-desc');
+            const btnCancel = document.getElementById('modal-btn-cancel');
+
+            titleEl.innerText = title;
+            descEl.innerText = desc;
+            btnCancel.classList.add('hidden'); // No cancel button for normal alerts
+
+            if (type === "success") {
+                icon.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-500"></i>';
+            } else {
+                icon.innerHTML = '<i class="fa-solid fa-info text-indigo-500"></i>';
+            }
+
+            modal.classList.remove('hidden');
+            modalActionCallback = null;
+        }
+
+        function showCustomConfirm(title, desc, confirmCallback) {
+            const modal = document.getElementById('custom-modal');
+            const icon = document.getElementById('modal-icon');
+            const titleEl = document.getElementById('modal-title');
+            const descEl = document.getElementById('modal-desc');
+            const btnCancel = document.getElementById('modal-btn-cancel');
+
+            titleEl.innerText = title;
+            descEl.innerText = desc;
+            icon.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-amber-500"></i>';
+            
+            btnCancel.classList.remove('hidden'); // Show cancel button
+            modal.classList.remove('hidden');
+            modalActionCallback = confirmCallback;
+        }
+
+        function closeModal() {
+            document.getElementById('custom-modal').classList.add('hidden');
+        }
+
+        // Confirm button in modal click action
+        document.getElementById('modal-btn-confirm').onclick = function() {
+            closeModal();
+            if (modalActionCallback) {
+                modalActionCallback();
+            }
+        };
+    </script>
+</body>
+</html>
